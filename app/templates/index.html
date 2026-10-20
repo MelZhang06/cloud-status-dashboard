@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="refresh" content="60" />
+  <title>Cloud Status Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card-bg: #1a1d24;
+      --border: #2a2e37;
+      --text: #e6e8eb;
+      --muted: #9aa0ab;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+    }
+    header {
+      max-width: 960px;
+      margin: 0 auto 2rem auto;
+    }
+    h1 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.6rem;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .grid {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .service-name {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .dot.yellow { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .dot.unknown { background: var(--muted); }
+    .notice { max-width: 960px; margin: 0 auto 1.5rem; color: var(--yellow); }
+    .dot.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    .message {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    footer {
+      max-width: 960px;
+      margin: 2rem auto 0 auto;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cloud Status Dashboard</h1>
+    <div class="meta">Region: {{ region }} &middot; Last successful fetch: {{ last_success_at or "Never" }} &middot; Auto-refreshes every 60s</div>
+  </header>
+
+  {% if data_state != "ok" %}
+  <p class="notice" role="alert">{{ error }}. Current status is unknown. Last successful data: {{ last_success_at or "Never" }}.</p>
+  {% endif %}
+
+  <main class="grid">
+    {% for s in services %}
+    <div class="card">
+      <div class="card-top">
+        <span class="service-name">{{ s.service }}</span>
+        <span class="dot {{ s.status }}" aria-label="{{ s.status }}"></span>
+      </div>
+      <div class="message">{{ s.scope }} · {{ s.status }}<br />{{ s.message }}</div>
+    </div>
+    {% endfor %}
+  </main>
+
+  <footer>
+    Data source: AWS public events · Green means no matching public event, not guaranteed availability.<br />
+    Public events only; this does not monitor resources in your AWS account. · <a href="/api/status">JSON</a>
+  </footer>
+</body>
+</html>

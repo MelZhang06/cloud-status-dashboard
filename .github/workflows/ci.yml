@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform validation (no AWS credentials)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.5"
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -lockfile=readonly
+      - run: terraform validate
+
+  app:
+    name: Application tests and container build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q tests ../tests
+      - run: docker build --platform linux/amd64 -t cloud-status:ci .
+      - name: Verify container health and dashboard routes
+        run: |
+          docker run -d --name cloud-status -p 8080:8080 cloud-status:ci
+          trap 'docker logs cloud-status; docker rm -f cloud-status' EXIT
+          curl --fail --retry 15 --retry-delay 1 --retry-all-errors --max-time 5 http://localhost:8080/health
+          curl --fail --max-time 20 http://localhost:8080/ > /dev/null
+          curl --fail --max-time 20 http://localhost:8080/api/status > /dev/null
