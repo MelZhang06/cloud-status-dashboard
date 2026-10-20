@@ -28,3 +28,4 @@ On 21 October 2026 (Melbourne time), image `20261020T130227Z` was deployed in `a
 - The dashboard, liveness endpoint and status API returned HTTP 200. The public feed was available and the API returned ten services.
 - Log retention was updated from 7 to 14 days through Terraform using `--skip-build`. The plan contained one in-place update and no resource additions or deletions.
 - AWS CLI confirmed the new retention value. Deployment verification passed again without changing the image tag or task-definition revision.
+- Cleanup completed: Terraform reported 28 resources destroyed. The local state contained no managed resources, and follow-up AWS CLI checks found no remaining project VPC, NAT gateway, Elastic IP, ALB, target group, active ECS cluster, ECR repository, log group or IAM roles.

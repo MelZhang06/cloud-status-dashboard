@@ -122,4 +122,6 @@ The initial deployment was verified on 21 October 2026 (Melbourne time; 20 Octob
 - Infrastructure update: log retention changed from 7 to 14 days in place; Terraform reported zero additions, one change and zero deletions.
 - After the update, deployment verification passed with the same image tag and task-definition revision. AWS CLI confirmed `retentionInDays: 14`.
 
-The screenshot above shows the deployed application. The environment is temporary and may be removed after verification. See the [deployment checklist](docs/DEPLOYMENT.md) for update and cleanup steps.
+- Cleanup: Terraform reported all 28 managed resources destroyed. Follow-up checks confirmed an empty Terraform state and no remaining project VPC, NAT gateway, Elastic IP, ALB, target group, active ECS cluster, ECR repository, CloudWatch log group or IAM roles.
+
+The screenshot above was captured while the application was running. The AWS environment has since been removed to avoid ongoing resource charges. See the [deployment checklist](docs/DEPLOYMENT.md) to reproduce the deployment.
