@@ -20,7 +20,7 @@ flowchart LR
     TF --> ECS
 ```
 
-Defaults: `ap-southeast-2`, one Linux/X86_64 task, 0.25 vCPU, 512 MiB, two public/private subnet pairs, one NAT gateway and seven-day log retention. Only the ALB is publicly reachable. The app's task role has no AWS API permissions; its execution role permits image pulls and log delivery.
+Defaults: `ap-southeast-2`, one Linux/X86_64 task, 0.25 vCPU, 512 MiB, two public/private subnet pairs, one NAT gateway and fourteen-day log retention. Only the ALB is publicly reachable. The app's task role has no AWS API permissions; its execution role permits image pulls and log delivery.
 
 ## Features
 
@@ -117,6 +117,9 @@ The initial deployment was verified on 21 October 2026 (Melbourne time; 20 Octob
 - ECS task definition revision: `cloud-status-task:1`.
 - Deployment script: service-stability, expected-task-definition and HTTP checks passed.
 - Endpoint verification: `/`, `/health` and `/api/status` returned HTTP 200; the API reported `data_state: ok` and ten services.
-- Initial CloudWatch log retention: seven days.
+- ECS runtime check: `ACTIVE`, desired/running count `1`, pending count `0`.
+- CloudWatch log stream confirmed for `cloud-status-app`.
+- Infrastructure update: log retention changed from 7 to 14 days in place; Terraform reported zero additions, one change and zero deletions.
+- After the update, deployment verification passed with the same image tag and task-definition revision. AWS CLI confirmed `retentionInDays: 14`.
 
 The screenshot above shows the deployed application. The environment is temporary and may be removed after verification. See the [deployment checklist](docs/DEPLOYMENT.md) for update and cleanup steps.
