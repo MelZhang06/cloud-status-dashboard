@@ -4,6 +4,8 @@ A Python/FastAPI dashboard with Terraform configuration for deployment to AWS EC
 
 The application summarises public AWS events for selected Sydney services and global IAM/CloudFront. It uses the public event feed and does not inspect account-specific resources. The infrastructure is sized for a small demonstration environment.
 
+![Cloud Status Dashboard running on AWS ECS Fargate](docs/images/dashboard.png)
+
 ## Architecture
 
 ```mermaid
@@ -109,4 +111,12 @@ One task and one NAT keep the demo smaller but provide no multi-AZ application a
 
 ## Deployment records
 
-After deployment, record the deployed image tag, region and verification results. The [deployment checklist](docs/DEPLOYMENT.md) includes a small infrastructure update and cleanup steps. Local tests and CI do not replace verification in the target AWS account.
+The initial deployment was verified on 21 October 2026 (Melbourne time; 20 October UTC) in `ap-southeast-2`.
+
+- Image tag: `20261020T130227Z`.
+- ECS task definition revision: `cloud-status-task:1`.
+- Deployment script: service-stability, expected-task-definition and HTTP checks passed.
+- Endpoint verification: `/`, `/health` and `/api/status` returned HTTP 200; the API reported `data_state: ok` and ten services.
+- Initial CloudWatch log retention: seven days.
+
+The screenshot above shows the deployed application. The environment is temporary and may be removed after verification. See the [deployment checklist](docs/DEPLOYMENT.md) for update and cleanup steps.
