@@ -40,10 +40,12 @@ if ! terraform state list | grep -qx 'aws_ecr_repository.app'; then
   echo "First deployment: review and approve creation of the ECR repository."
   terraform apply -target=aws_ecr_repository.app
 fi
-AWS_REGION="$(terraform output -raw aws_region)"
 ECR_REPO="$(terraform output -raw ecr_repository_url)"
 REGISTRY="${ECR_REPO%%/*}"
 REPO_NAME="${ECR_REPO#*/}"
+# The initial targeted apply saves the ECR output, but not unrelated outputs.
+AWS_REGION="${REGISTRY#*.dkr.ecr.}"
+AWS_REGION="${AWS_REGION%.amazonaws.com}"
 # Cross-check the registry account before uploading any image.
 if [[ "$REGISTRY" != "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com" ]]; then
   echo "Terraform state and active AWS account/region do not match: $REGISTRY" >&2

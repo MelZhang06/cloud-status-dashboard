@@ -23,7 +23,7 @@ if name == "terraform":
     if args[:2] == ["state", "list"]:
         if os.environ.get("HAS_STATE") == "1": print("aws_ecr_repository.app")
     elif args[:2] == ["output", "-raw"]:
-        print({"aws_region":"ap-southeast-2", "ecr_repository_url":"123456789012.dkr.ecr.ap-southeast-2.amazonaws.com/cloud-status", "ecs_cluster_name":"demo-cluster", "ecs_service_name":"demo-service", "ecs_task_definition_arn":"arn:task:2", "alb_dns_name":"http://example.test"}[args[2]])
+        print({"ecr_repository_url":"123456789012.dkr.ecr.ap-southeast-2.amazonaws.com/cloud-status", "ecs_cluster_name":"demo-cluster", "ecs_service_name":"demo-service", "ecs_task_definition_arn":"arn:task:2", "alb_dns_name":"http://example.test"}[args[2]])
 elif name == "aws":
     if args[:2] == ["sts", "get-caller-identity"]: print("123456789012")
     elif args[:2] == ["ecr", "get-login-password"]: print("test-password")
@@ -60,6 +60,7 @@ def test_initial_deploy_pushes_image_before_full_apply_and_verifies(tmp_path):
     wait = next(i for i,c in enumerate(commands) if c[:3] == ["aws", "ecs", "wait"])
     assert bootstrap < push < apply < wait
     assert any(c[:2] == ["docker", "build"] and "linux/amd64" in c for c in commands)
+    assert ["terraform", "output", "-raw", "aws_region"] not in commands
 
 
 def test_wrong_account_exits_before_terraform(tmp_path):
