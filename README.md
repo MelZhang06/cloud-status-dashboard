@@ -1,6 +1,6 @@
 # Cloud Status Dashboard
 
-A Python/FastAPI dashboard with Terraform configuration for deployment to AWS ECS Fargate. The project includes container builds, image publishing, deployment verification and GitHub Actions CI.
+A personal cloud engineering project using Python/FastAPI and Terraform to deploy a status dashboard on AWS ECS Fargate. The project includes container builds, image publishing, deployment verification and GitHub Actions CI.
 
 The application summarises public AWS events for selected Sydney services and global IAM/CloudFront. It uses the public event feed and does not inspect account-specific resources. The infrastructure is sized for a small demonstration environment.
 
